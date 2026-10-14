@@ -7,6 +7,7 @@ globalThis.Response = WorkerResponse;
 import { Readable } from 'node:stream';
 import { Console } from 'node:console';
 import { createKVStore } from '../lib/kv-store.mjs';
+import { originalRequestUrl } from '../lib/original-url.mjs';
 
 // KV keys look like "config:vless_uuid", which is not a legal env-var name, so
 // the old `process.env[k]` fallback never matched anything.
@@ -36,9 +37,7 @@ if (kvWarning) console.warn('[BlueKnight] ' + kvWarning);
 
 export async function handler(req, res) {
   try {
-    const proto = req.headers['x-forwarded-proto'] || 'https';
-    const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost';
-    const url = new URL(req.url, `${proto}://${host}`);
+    const url = originalRequestUrl(req);
 
     const headers = new Headers();
     for (const [k, v] of Object.entries(req.headers)) {

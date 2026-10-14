@@ -1,6 +1,6 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/((?!assets/).*)", "destination": "/api/index.js" }
+    { "source": "/((?!assets/).*)", "destination": "/api/index.js?__bk_path=/$1" }
   ]
 }
