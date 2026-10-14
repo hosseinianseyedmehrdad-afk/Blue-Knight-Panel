@@ -8,6 +8,7 @@ import { WebSocketPair, WorkerResponse } from './lib/ws-node.mjs';
 
 import { installWorkerUpgrades } from './lib/upgrade-node.mjs';
 import { createKVStore } from './lib/kv-store.mjs';
+import { originalRequestUrl } from './lib/original-url.mjs';
 
 // 1. Real WebSocket + workerd-Response shims (see lib/ws-node.mjs)
 globalThis.WebSocketPair = WebSocketPair;
@@ -110,9 +111,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 
 const server = http.createServer(async (req, res) => {
   try {
-    const proto = req.headers['x-forwarded-proto'] || (req.socket.encrypted ? 'https' : 'http');
-    const host = req.headers['x-forwarded-host'] || req.headers.host || `localhost:${PORT}`;
-    const url = new URL(req.url, `${proto}://${host}`);
+    const url = originalRequestUrl(req);
 
     // Fast static file serving for assets from disk if present
     if (req.method === 'GET' || req.method === 'HEAD') {
